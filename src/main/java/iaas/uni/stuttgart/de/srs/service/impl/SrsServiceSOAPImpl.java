@@ -19,8 +19,7 @@ import de.uni_stuttgart.iaas.srsservice.SubscribeRequest;
  * Generated source version: 3.1.0
  * 
  */
-
-@javax.jws.WebService(serviceName = "srsService", portName = "srsServiceSOAP", targetNamespace = "http://www.iaas.uni-stuttgart.de/srsService/", wsdlLocation = "file:/Users/nyu/Documents/situationalworkflow/workspace/srsTestService/src/main/resources/srsService.wsdl", endpointInterface = "de.uni_stuttgart.iaas.srsservice.SrsService")
+@javax.jws.WebService(serviceName = "srsService", portName = "srsServiceSOAP", targetNamespace = "http://www.iaas.uni-stuttgart.de/srsService/", endpointInterface = "de.uni_stuttgart.iaas.srsservice.SrsService")
 public class SrsServiceSOAPImpl implements SrsService {
 
 	private static final Logger LOG = Logger.getLogger(SrsServiceSOAPImpl.class
