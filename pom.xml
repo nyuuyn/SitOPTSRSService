@@ -42,6 +42,13 @@
 								<wsdlOption>
 									<wsdl>${basedir}/src/main/resources/srsService.wsdl</wsdl>
 									<!-- <extraargs> <extraarg>-impl</extraarg> </extraargs> -->
+									<extraargs>
+										<extraarg>-client</extraarg>
+									</extraargs>
+								</wsdlOption>
+								<wsdlOption>
+									<wsdl>${basedir}/src/main/resources/srsService.wsdl</wsdl>
+									<!-- <extraargs> <extraarg>-impl</extraarg> </extraargs> -->									
 								</wsdlOption>
 							</wsdlOptions>
 						</configuration>
