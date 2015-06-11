@@ -48,7 +48,7 @@
 								</wsdlOption>
 								<wsdlOption>
 									<wsdl>${basedir}/src/main/resources/srsService.wsdl</wsdl>
-									<!-- <extraargs> <extraarg>-impl</extraarg> </extraargs> -->									
+									<!-- <extraargs> <extraarg>-impl</extraarg> </extraargs> -->
 								</wsdlOption>
 							</wsdlOptions>
 						</configuration>
@@ -117,8 +117,15 @@
 		<dependency>
 			<groupId>jstl</groupId>
 			<artifactId>jstl</artifactId>
-			<version>1.2</version>			
+			<version>1.2</version>
 		</dependency>
+
+		<dependency>
+			<groupId>com.efsavage.jquery</groupId>
+			<artifactId>jquery-maven</artifactId>
+			<version>1.7.2</version>
+		</dependency>
+
 
 		<!-- uncomment this to get JSON support <dependency> <groupId>org.glassfish.jersey.media</groupId> 
 			<artifactId>jersey-media-moxy</artifactId> </dependency> -->

@@ -5,12 +5,21 @@
 
 package iaas.uni.stuttgart.de.srs.service.impl;
 
+import iaas.uni.stuttgart.de.srs.data.ObservedObjectDataSource;
+import iaas.uni.stuttgart.de.srs.data.SituationDataSource;
 import iaas.uni.stuttgart.de.srs.data.SubscriptionsSingleton;
+import iaas.uni.stuttgart.de.srs.model.ObservedObject;
+import iaas.uni.stuttgart.de.srs.model.Situation;
 import iaas.uni.stuttgart.de.srs.model.Subscription;
 
 import java.util.logging.Logger;
 
 import de.uni_stuttgart.iaas.srsservice.GetRequest;
+import de.uni_stuttgart.iaas.srsservice.GetResponse;
+import de.uni_stuttgart.iaas.srsservice.PropertyMapItemType;
+import de.uni_stuttgart.iaas.srsservice.PropertyMapType;
+import de.uni_stuttgart.iaas.srsservice.SituationEventStatusType;
+import de.uni_stuttgart.iaas.srsservice.SituationEventType;
 import de.uni_stuttgart.iaas.srsservice.SrsService;
 import de.uni_stuttgart.iaas.srsservice.SubscribeRequest;
 
@@ -39,7 +48,7 @@ public class SrsServiceSOAPImpl implements SrsService {
 		Subscription sub = new Subscription(parameters.getSituation(),
 				parameters.getObject(), parameters.getCorrelation(),
 				parameters.getEndpoint());
-		
+
 		SubscriptionsSingleton.getInstance().subscriptions.add(sub);
 
 	}
@@ -56,7 +65,50 @@ public class SrsServiceSOAPImpl implements SrsService {
 		LOG.info("Executing operation get");
 		System.out.println(parameters);
 		try {
-			de.uni_stuttgart.iaas.srsservice.GetResponse _return = null;
+
+			de.uni_stuttgart.iaas.srsservice.GetResponse _return = new GetResponse();
+
+			for (SituationEventType situationEvent : parameters
+					.getSituationEvent()) {
+				String situationId = situationEvent.getSituation();
+				String objId = situationEvent.getObject();
+				
+				ObservedObject requestedObj = null;
+				for (ObservedObject obsObj : ObservedObjectDataSource.getInstance().objects) {
+					if (objId.equals(obsObj.getId())) {
+						requestedObj = obsObj;
+					}
+				}
+
+				Situation requestedSituation = null;
+				for (Situation situation : SituationDataSource.getInstance().situations) {
+					if (situationId.equals(situation.getId())) {
+						requestedSituation = situation;
+					}
+				}
+				
+				PropertyMapType props = new PropertyMapType();
+
+				for (String property : requestedSituation.observedProperties) {
+					if (requestedObj.getProperties().containsKey(property)) {
+						PropertyMapItemType propItem = new PropertyMapItemType();
+						propItem.setKey(property);
+						propItem.setValue(String.valueOf(requestedObj
+								.getProperties().get(property)));
+						props.getProperty().add(propItem);
+					}
+				}
+				
+				
+				SituationEventStatusType sitStatus = new SituationEventStatusType();
+				
+				sitStatus.setSituationId(situationId);
+				sitStatus.setObjectId(objId);
+				sitStatus.setPropertyMap(props);
+				sitStatus.setTriggered(requestedSituation.isTriggered(requestedObj));
+				
+				_return.getSituation().add(sitStatus);
+			}
 			return _return;
 		} catch (java.lang.Exception ex) {
 			ex.printStackTrace();
