@@ -5,9 +5,9 @@
 
 package iaas.uni.stuttgart.de.srs.service.impl;
 
-import iaas.uni.stuttgart.de.srs.data.ObservedObjectDataSource;
-import iaas.uni.stuttgart.de.srs.data.SituationDataSource;
-import iaas.uni.stuttgart.de.srs.data.SubscriptionsSingleton;
+import iaas.uni.stuttgart.de.srs.data.rest.ObservedObjectDataSource;
+import iaas.uni.stuttgart.de.srs.data.rest.SituationDataSource;
+import iaas.uni.stuttgart.de.srs.data.rest.SubscriptionsSingleton;
 import iaas.uni.stuttgart.de.srs.model.ObservedObject;
 import iaas.uni.stuttgart.de.srs.model.Situation;
 import iaas.uni.stuttgart.de.srs.model.Subscription;
@@ -101,9 +101,11 @@ public class SrsServiceSOAPImpl implements SrsService {
 			Subscription subscription = new Subscription(sub.getSituation(),
 					sub.getObject(), correlation, endpoint, msgId);
 
-			System.out.println("Adding subscription: " + subscription.toString());
-			SubscriptionsSingleton.getInstance().subscriptions
-					.add(subscription);
+		 	System.out.println("Adding subscription: " + subscription.toString());
+		 			 	
+		 	SubscriptionsSingleton subData = new SubscriptionsSingleton();
+		 	
+			subData.addSubscription(subscription);
 		}
 		// }
 
@@ -144,15 +146,17 @@ public class SrsServiceSOAPImpl implements SrsService {
 				String objId = situationEvent.getObject();
 
 				ObservedObject requestedObj = null;
-				for (ObservedObject obsObj : ObservedObjectDataSource
-						.getInstance().objects) {
+				ObservedObjectDataSource objData = new ObservedObjectDataSource();
+				SituationDataSource sitData = new SituationDataSource();
+				
+				for (ObservedObject obsObj : objData.getObjects()) {
 					if (objId.equals(obsObj.getId())) {
 						requestedObj = obsObj;
 					}
 				}
 
 				Situation requestedSituation = null;
-				for (Situation situation : SituationDataSource.getInstance().situations) {
+				for (Situation situation : sitData.getSituations()) {
 					if (situationId.equals(situation.getId())) {
 						requestedSituation = situation;
 					}

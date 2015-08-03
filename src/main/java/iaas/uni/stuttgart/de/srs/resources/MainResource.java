@@ -5,9 +5,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
 
-import iaas.uni.stuttgart.de.srs.data.MainResourceDAO;
-import iaas.uni.stuttgart.de.srs.data.ObservedObjectDataSource;
-import iaas.uni.stuttgart.de.srs.data.SubscriptionsSingleton;
+import iaas.uni.stuttgart.de.srs.data.rest.MainResourceDAO;
+import iaas.uni.stuttgart.de.srs.data.rest.ObservedObjectDataSource;
+import iaas.uni.stuttgart.de.srs.data.rest.SituationDataSource;
+import iaas.uni.stuttgart.de.srs.data.rest.SubscriptionsSingleton;
 import iaas.uni.stuttgart.de.srs.model.ObservedObject;
 import iaas.uni.stuttgart.de.srs.model.Subscription;
 import iaas.uni.stuttgart.de.srs.service.impl.SrsServiceSOAPImpl;
@@ -32,7 +33,6 @@ import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.ws.addressing.AddressingProperties;
-import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.RelatesToType;
 import org.apache.cxf.ws.addressing.WSAddressingFeature;
@@ -67,7 +67,7 @@ public class MainResource {
 	@GET
 	@Produces(MediaType.TEXT_HTML)
 	public Response root() {
-		Viewable view = new Viewable("index", new MainResourceDAO());
+		Viewable view = new Viewable("index", new MainResourceDAO(new ObservedObjectDataSource(), new SituationDataSource(), new SubscriptionsSingleton()));
 		return Response.ok(view).build();
 	}
 
@@ -91,7 +91,9 @@ public class MainResource {
 
 			String objectId = params[0].split("=")[1];
 
-			for (ObservedObject obj : ObservedObjectDataSource.getInstance().objects) {
+			ObservedObjectDataSource objData = new ObservedObjectDataSource();
+			
+			for (ObservedObject obj : objData.getObjects()) {
 				if (obj.getId().equals(objectId)) {
 					System.out.println("Found object: " + objectId);
 					for (int i = 1; i < params.length; i++) {
@@ -188,13 +190,15 @@ public class MainResource {
 
 		notifyService.notify(notifyReq);
 
-		Viewable view = new Viewable("index", new MainResourceDAO());
+		Viewable view = new Viewable("index", new MainResourceDAO( new ObservedObjectDataSource(), new SituationDataSource(), new SubscriptionsSingleton()));
 		return Response.ok(view).build();
 	}
 
 	private Subscription getSub(String situation, String object,
 			String correlation, String endpoint) {
-		for (Subscription sub : SubscriptionsSingleton.getInstance().subscriptions) {
+		SubscriptionsSingleton subData = new SubscriptionsSingleton();
+		
+		for (Subscription sub : subData.getSubscriptions()) {
 			if (sub.getSituationId().equals(situation)
 					&& sub.getObjectId().equals(object)
 					&& sub.getCorrelation().equals(correlation)
