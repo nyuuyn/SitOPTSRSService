@@ -126,6 +126,12 @@
 			<version>1.7.2</version>
 		</dependency>
 		
+		<dependency>
+  <groupId>org.glassfish.jersey.media</groupId>
+  <artifactId>jersey-media-json-jackson</artifactId>
+  <scope>runtime</scope>
+</dependency>
+		
 	<dependency>
 	<groupId>net.sf.json-lib</groupId>
 	<artifactId>json-lib</artifactId>

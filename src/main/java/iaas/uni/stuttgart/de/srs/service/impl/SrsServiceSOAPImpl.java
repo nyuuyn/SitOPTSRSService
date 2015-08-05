@@ -5,17 +5,18 @@
 
 package iaas.uni.stuttgart.de.srs.service.impl;
 
-import iaas.uni.stuttgart.de.srs.data.rest.ObservedObjectDataSource;
-import iaas.uni.stuttgart.de.srs.data.rest.SituationDataSource;
-import iaas.uni.stuttgart.de.srs.data.rest.SubscriptionsSingleton;
-import iaas.uni.stuttgart.de.srs.model.ObservedObject;
-import iaas.uni.stuttgart.de.srs.model.Situation;
+import iaas.uni.stuttgart.de.srs.data.rest.ThingDataSource;
+import iaas.uni.stuttgart.de.srs.data.rest.SituationTemplateDataSource;
+import iaas.uni.stuttgart.de.srs.data.rest.SubscriptionDataSource;
+import iaas.uni.stuttgart.de.srs.model.Thing;
+import iaas.uni.stuttgart.de.srs.model.SituationTemplate;
 import iaas.uni.stuttgart.de.srs.model.Subscription;
 
 import java.util.List;
 import java.util.logging.Logger;
 
 import javax.annotation.Resource;
+import javax.servlet.ServletRequest;
 import javax.xml.bind.JAXB;
 import javax.xml.bind.JAXBElement;
 import javax.xml.ws.WebServiceContext;
@@ -61,6 +62,7 @@ public class SrsServiceSOAPImpl implements SrsService {
 	 * .iaas.srsservice.SubscribeRequest parameters )*
 	 */
 	public void subscribe(SubscribeRequest parameters) {
+		
 		LOG.info("Executing operation subscribe");
 		System.out.println(parameters);
 
@@ -103,7 +105,7 @@ public class SrsServiceSOAPImpl implements SrsService {
 
 		 	System.out.println("Adding subscription: " + subscription.toString());
 		 			 	
-		 	SubscriptionsSingleton subData = new SubscriptionsSingleton();
+		 	SubscriptionDataSource subData = new SubscriptionDataSource();
 		 	
 			subData.addSubscription(subscription);
 		}
@@ -145,18 +147,18 @@ public class SrsServiceSOAPImpl implements SrsService {
 				String situationId = situationEvent.getSituation();
 				String objId = situationEvent.getObject();
 
-				ObservedObject requestedObj = null;
-				ObservedObjectDataSource objData = new ObservedObjectDataSource();
-				SituationDataSource sitData = new SituationDataSource();
+				Thing requestedObj = null;
+				ThingDataSource objData = new ThingDataSource();
+				SituationTemplateDataSource sitData = new SituationTemplateDataSource();
 				
-				for (ObservedObject obsObj : objData.getObjects()) {
+				for (Thing obsObj : objData.getThings()) {
 					if (objId.equals(obsObj.getId())) {
 						requestedObj = obsObj;
 					}
 				}
 
-				Situation requestedSituation = null;
-				for (Situation situation : sitData.getSituations()) {
+				SituationTemplate requestedSituation = null;
+				for (SituationTemplate situation : sitData.getSituationTemplates()) {
 					if (situationId.equals(situation.getId())) {
 						requestedSituation = situation;
 					}
@@ -164,7 +166,7 @@ public class SrsServiceSOAPImpl implements SrsService {
 
 				PropertyMapType props = new PropertyMapType();
 
-				for (String property : requestedSituation.observedProperties) {
+				for (String property : requestedSituation.getObservedSituations()) {
 					if (requestedObj.getProperties().containsKey(property)) {
 						PropertyMapItemType propItem = new PropertyMapItemType();
 						propItem.setKey(property);

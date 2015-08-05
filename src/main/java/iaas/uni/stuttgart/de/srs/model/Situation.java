@@ -1,45 +1,25 @@
 package iaas.uni.stuttgart.de.srs.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
-/**
- * @author Kalman Kepes - kepeskn@studi.informatik.uni-stuttgart.de
- *
- */
 public class Situation {
-	
 	private String id;
+	private String thing;
+	private String situationTemplate;
 
-	public List<String> observedProperties = new ArrayList<String>();
-	
-	public Situation(String id){
+	public Situation(String id, String thing, String situationTemplate){
 		this.id = id;
+		this.thing = thing;
+		this.situationTemplate = situationTemplate;
 	}
 	
-	public List<String> getObservedProperties() {
-		return observedProperties;
-	}
-
-	public void setObservedProperties(List<String> observedProperties) {
-		this.observedProperties = observedProperties;
-	}
-
 	public String getId() {
-		return id;
+		return this.id;
 	}
-	
-	public boolean isTriggered(ObservedObject obsObj){
-		
-		// makes a simple conjunction
-		boolean result = true;
-		
-		for(String prop : this.observedProperties){
-			if(obsObj.getProperties().containsKey(prop)){
-				result &= obsObj.getProperties().get(prop);
-			}
-		}
-		
-		return result;
+
+	public String getThing() {
+		return this.thing;
+	}
+
+	public String getSituationTemplate() {
+		return this.situationTemplate;
 	}
 }

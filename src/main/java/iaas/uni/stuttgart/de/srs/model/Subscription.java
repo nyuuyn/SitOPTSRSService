@@ -6,16 +6,16 @@ package iaas.uni.stuttgart.de.srs.model;
  */
 public class Subscription {
 
-	private String situationId;
-	private String objectId;
+	private String situationTemplateId;
+	private String thingId;
 	private String correlation;
 	private String endpoint;
 	private String addressingMsgId;
 
 	public Subscription(String situationId, String objectId,
 			String correlation, String endpoint, String addressingMsgId) {
-		this.situationId = situationId;
-		this.objectId = objectId;
+		this.situationTemplateId = situationId;
+		this.thingId = objectId;
 		this.correlation = correlation;
 		this.endpoint = endpoint;
 		this.addressingMsgId = addressingMsgId;
@@ -25,12 +25,12 @@ public class Subscription {
 		return this.addressingMsgId;
 	}
 
-	public String getSituationId() {
-		return situationId;
+	public String getSituationTemplateId() {
+		return situationTemplateId;
 	}
 
-	public String getObjectId() {
-		return objectId;
+	public String getThingId() {
+		return thingId;
 	}
 
 	public String getCorrelation() {
@@ -43,8 +43,8 @@ public class Subscription {
 
 	@Override
 	public String toString() {
-		return "Subscription: \n SituationId: " + this.situationId
-				+ "\n ObjectId: " + this.objectId + "\n Correlation: "
+		return "Subscription: \n SituationId: " + this.situationTemplateId
+				+ "\n ObjectId: " + this.thingId + "\n Correlation: "
 				+ this.correlation + "\n Endpoint: " + endpoint + "\n addressingMsgId: " + this.addressingMsgId;
 	}
 

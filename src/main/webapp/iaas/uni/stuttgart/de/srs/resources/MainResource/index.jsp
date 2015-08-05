@@ -85,21 +85,21 @@ li.active a, li.active a:hover {
 	<div class="tabs">
 		<ul class="tab-links">
 			<li class="active"><a href="#tab1">Subscriptions</a></li>
-			<li><a href="#tab2">Situations</a></li>
-			<li><a href="#tab3">Objects</a></li>
+			<li><a href="#tab2">SituationTemplates</a></li>
+			<li><a href="#tab3">Things</a></li>
 		</ul>
 
 		<div class="tab-content">
 			<div id="tab1" class="tab active">
 				<p>
 					<c:forEach var="sub" items="${it.subs}">
-						Situation: ${sub.situationId} <br />
-						Object: ${sub.objectId} <br />
+						SituationTemplate: ${sub.situationTemplateId} <br />
+						Thing: ${sub.thingId} <br />
 						Correlation: ${sub.correlation} <br />
 						Endpoint: ${sub.endpoint} <br />
 						<form name="notifyForm" action="./rest" method="POST">
-							<input name="Situation" type="hidden" value="${sub.situationId}">
-							<input name="Object" type="hidden" value="${sub.objectId}">
+							<input name="Situation" type="hidden" value="${sub.situationTemplateId}">
+							<input name="Object" type="hidden" value="${sub.thingId}">
 							<input name="Correlation" type="hidden"
 								value="${sub.correlation}"> <input name="Endpoint"
 								type="hidden" value="${sub.endpoint}"> <input
@@ -111,9 +111,10 @@ li.active a, li.active a:hover {
 
 			<div id="tab2" class="tab">
 				<c:forEach var="sit" items="${it.sits}">
-					Situation: ${sit.id} <br />
-					ObservedProperties: <br />
-					<c:forEach var="property" items="${sit.observedProperties}">
+					SituationTemplateId: ${sit.id} <br />
+					Name: ${sit.name} <br/>
+					Situations: <br />
+					<c:forEach var="property" items="${sit.observedSituations}">
 						${property},
 					</c:forEach>
 					<br />
@@ -124,6 +125,7 @@ li.active a, li.active a:hover {
 			<div id="tab3" class="tab">
 				<c:forEach var="obj" items="${it.objs}">
 					Object: ${obj.id} <br />
+					Name: ${obj.name} <br />
 					Properties: <br />
 					<form id="updateObjectForm" action="./rest/object" method="POST">
 						<input name="objectId" value="${obj.id}" type="hidden" />

@@ -1,7 +1,7 @@
 package iaas.uni.stuttgart.de.srs.data.rest;
 
-import iaas.uni.stuttgart.de.srs.model.ObservedObject;
-import iaas.uni.stuttgart.de.srs.model.Situation;
+import iaas.uni.stuttgart.de.srs.model.Thing;
+import iaas.uni.stuttgart.de.srs.model.SituationTemplate;
 import iaas.uni.stuttgart.de.srs.model.Subscription;
 
 import java.util.List;
@@ -12,23 +12,23 @@ import java.util.List;
  */
 public class MainResourceDAO {
 
-	private ObservedObjectDataSource obsObjData;
-	private SituationDataSource sitData;
-	private SubscriptionsSingleton subData;
+	private ThingDataSource obsObjData;
+	private SituationTemplateDataSource sitData;
+	private SubscriptionDataSource subData;
 	
 
-	public MainResourceDAO(ObservedObjectDataSource obsObjData, SituationDataSource sitData, SubscriptionsSingleton subData) {
+	public MainResourceDAO(ThingDataSource obsObjData, SituationTemplateDataSource sitData, SubscriptionDataSource subData) {
 		this.obsObjData = obsObjData;
 		this.sitData = sitData;
 		this.subData = subData;
 	}
 
-	public List<ObservedObject> getObjs() {
-		return this.obsObjData.getObjects();
+	public List<Thing> getObjs() {
+		return this.obsObjData.getThings();
 	}
 
-	public List<Situation> getSits() {
-		return this.sitData.getSituations();
+	public List<SituationTemplate> getSits() {
+		return this.sitData.getSituationTemplates();
 	}
 
 	public List<Subscription> getSubs() {

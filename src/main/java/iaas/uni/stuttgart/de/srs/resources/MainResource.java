@@ -6,10 +6,10 @@ import java.net.URL;
 import java.util.Map;
 
 import iaas.uni.stuttgart.de.srs.data.rest.MainResourceDAO;
-import iaas.uni.stuttgart.de.srs.data.rest.ObservedObjectDataSource;
-import iaas.uni.stuttgart.de.srs.data.rest.SituationDataSource;
-import iaas.uni.stuttgart.de.srs.data.rest.SubscriptionsSingleton;
-import iaas.uni.stuttgart.de.srs.model.ObservedObject;
+import iaas.uni.stuttgart.de.srs.data.rest.ThingDataSource;
+import iaas.uni.stuttgart.de.srs.data.rest.SituationTemplateDataSource;
+import iaas.uni.stuttgart.de.srs.data.rest.SubscriptionDataSource;
+import iaas.uni.stuttgart.de.srs.model.Thing;
 import iaas.uni.stuttgart.de.srs.model.Subscription;
 import iaas.uni.stuttgart.de.srs.service.impl.SrsServiceSOAPImpl;
 
@@ -63,11 +63,16 @@ public class MainResource {
 		factory.getOutInterceptors().add(loggingOutInterceptor);
 
 	}
+	
+	@Path("/callback")
+	public CallbackResource getCallbackResource(){
+		return new CallbackResource();
+	}
 
 	@GET
 	@Produces(MediaType.TEXT_HTML)
 	public Response root() {
-		Viewable view = new Viewable("index", new MainResourceDAO(new ObservedObjectDataSource(), new SituationDataSource(), new SubscriptionsSingleton()));
+		Viewable view = new Viewable("index", new MainResourceDAO(new ThingDataSource(), new SituationTemplateDataSource(), new SubscriptionDataSource()));
 		return Response.ok(view).build();
 	}
 
@@ -91,9 +96,9 @@ public class MainResource {
 
 			String objectId = params[0].split("=")[1];
 
-			ObservedObjectDataSource objData = new ObservedObjectDataSource();
+			ThingDataSource objData = new ThingDataSource();
 			
-			for (ObservedObject obj : objData.getObjects()) {
+			for (Thing obj : objData.getThings()) {
 				if (obj.getId().equals(objectId)) {
 					System.out.println("Found object: " + objectId);
 					for (int i = 1; i < params.length; i++) {
@@ -190,17 +195,17 @@ public class MainResource {
 
 		notifyService.notify(notifyReq);
 
-		Viewable view = new Viewable("index", new MainResourceDAO( new ObservedObjectDataSource(), new SituationDataSource(), new SubscriptionsSingleton()));
+		Viewable view = new Viewable("index", new MainResourceDAO( new ThingDataSource(), new SituationTemplateDataSource(), new SubscriptionDataSource()));
 		return Response.ok(view).build();
 	}
 
 	private Subscription getSub(String situation, String object,
 			String correlation, String endpoint) {
-		SubscriptionsSingleton subData = new SubscriptionsSingleton();
+		SubscriptionDataSource subData = new SubscriptionDataSource();
 		
 		for (Subscription sub : subData.getSubscriptions()) {
-			if (sub.getSituationId().equals(situation)
-					&& sub.getObjectId().equals(object)
+			if (sub.getSituationTemplateId().equals(situation)
+					&& sub.getThingId().equals(object)
 					&& sub.getCorrelation().equals(correlation)
 					&& sub.getEndpoint().equals(endpoint)) {
 				return sub;
