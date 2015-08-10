@@ -17,7 +17,7 @@ public class Configuration {
 	public String getSitOPTSRSServiceAddress(){
 		// TODO pretty weak check for the address of this service
 		try {
-			return InetAddress.getLocalHost().getHostAddress() + ":8080";
+			return InetAddress.getLocalHost().getHostAddress() + ":8080/srsTestService";
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		}
