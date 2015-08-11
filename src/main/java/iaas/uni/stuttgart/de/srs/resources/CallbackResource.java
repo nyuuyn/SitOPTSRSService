@@ -44,7 +44,6 @@ public class CallbackResource extends RESTResource {
 		String body = null;
 		try {
 			body = IOUtils.readStringFromStream(httpRequest.getInputStream());
-			System.out.println("Raw-Body: \n" + body);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
