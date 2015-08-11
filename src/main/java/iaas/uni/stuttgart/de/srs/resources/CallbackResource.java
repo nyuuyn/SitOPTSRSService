@@ -18,6 +18,7 @@ import javax.ws.rs.core.Response;
 
 import org.apache.cxf.helpers.IOUtils;
 
+import iaas.uni.stuttgart.de.srs.model.Subscription;
 import net.sf.json.JSON;
 import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
@@ -33,7 +34,11 @@ public class CallbackResource extends RESTResource {
 	public Response callback(@Context HttpServletRequest httpRequest) {
 
 		// http://host:port/srsService/rest/callback/{correlationId}/{addressingId}/{sitMeProcessCallbackAddressEncoded}
-		// TODO Callback to SitME Process
+		String callbackEndpoint = null;
+		String addressingId = null;
+		String correlationId = null;
+		String situationId = null;
+		String thingId = null;
 
 		System.out.println("CallbackResource#callback called with: ");
 		String body = null;
@@ -43,15 +48,14 @@ public class CallbackResource extends RESTResource {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		JSON jsonBody = JSONSerializer.toJSON(body);
-		
+
+		situationId = ((JSONObject) jsonBody).getString("situationtemplate");
+		thingId = ((JSONObject) jsonBody).getString("thing");
+
 		System.out.println("Parsed JSON body: ");
 		System.out.println(jsonBody);
-
-		String callbackEndpoint = null;
-		String addressingId = null;
-		String correlationId = null;
 
 		System.out.println("HTTPServletRequest: ");
 
@@ -84,8 +88,10 @@ public class CallbackResource extends RESTResource {
 		System.out.println("AddressingId: " + addressingId);
 		System.out.println("CallbackEndpoint: " + callbackEndpoint);
 
-		// this.getSub(situation, object, correlationId, endpoint)
+		Subscription sub = this.getSub(situationId, thingId, correlationId, callbackEndpoint);
 
+		this.notifyService(sub);
+		
 		return Response.accepted().build();
 	}
 
