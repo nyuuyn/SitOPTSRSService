@@ -21,6 +21,9 @@ import javax.ws.rs.core.UriBuilder;
 
 public class RootResource extends HttpServlet {
 
+	/**
+	 * MainHook for the REST API. This method will redirect to the JAX-RS resources
+	 */
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		// Set response content type
