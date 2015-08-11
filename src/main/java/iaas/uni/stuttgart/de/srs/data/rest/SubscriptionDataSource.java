@@ -69,51 +69,7 @@ public class SubscriptionDataSource {
 		return subs;
 	}
 	
-	private String fetchAddressingIdFromSitOPTCallbackEndpoint(String sitOptCallbackEndpoint){
-		// we gonna fetch the CallbackEndpoint part
-		// http://192.168.209.224:8080/srsTestService/rest/callback?CorrelationId=someCorrelation123&AddressingId=null&CallbackEndpoint=http%3A%2F%2F192.168.209.224%3A9763%2Fservices%2FsrsServiceCallback
-		System.out.println("Fetching SitME Workflow AddressingId from " + sitOptCallbackEndpoint);
-		
-		String queryString = sitOptCallbackEndpoint.split("?")[1];
-		
-		String addressingIdStringDirty = queryString.split("AddressingId=")[1];
-
-		String addressingIdString = addressingIdStringDirty.substring(0, addressingIdStringDirty.indexOf("&"));
-		
-		return addressingIdString;
-		
-	}
 	
-	private String fetchCorrelationFromSitOPTCallbackEndpoint(String sitOptCallbackEndpoint){
-		// we gonna fetch the CallbackEndpoint part
-		// http://192.168.209.224:8080/srsTestService/rest/callback?CorrelationId=someCorrelation123&AddressingId=null&CallbackEndpoint=http%3A%2F%2F192.168.209.224%3A9763%2Fservices%2FsrsServiceCallback
-		System.out.println("Fetching SitME Workflow CorrelationID from " + sitOptCallbackEndpoint);
-		
-		String queryString = sitOptCallbackEndpoint.split("?")[1];
-		
-		String correlationIdStringDirty = queryString.split("CorrelationId=")[1];
-		
-		String correlationIdString = correlationIdStringDirty.substring(0, correlationIdStringDirty.indexOf("&"));
-
-		return correlationIdString;
-		
-	}
-	
-	private String fetchEndpointFromSitOPTCallbackEndpoint(String sitOptCallbackEndpoint){
-		// we gonna fetch the CallbackEndpoint part
-		// http://192.168.209.224:8080/srsTestService/rest/callback?CorrelationId=someCorrelation123&AddressingId=null&CallbackEndpoint=http%3A%2F%2F192.168.209.224%3A9763%2Fservices%2FsrsServiceCallback
-		System.out.println("Fetching SitME Workflow callbackEndpoint from " + sitOptCallbackEndpoint);
-		
-		String queryString = sitOptCallbackEndpoint.split("?")[1];
-		
-		String encodedCallbackEndpointString = queryString.split("CallbackEndpoint=")[1];
-
-		String decodedCallbackEndpointString = URLDecoder.decode(encodedCallbackEndpointString);
-	
-		System.out.println("Found following Endpoint: " + decodedCallbackEndpointString);
-		return decodedCallbackEndpointString;
-		
-	}
 
 	public void addSubscription(Subscription sub) {
 
@@ -159,6 +115,54 @@ public class SubscriptionDataSource {
 			e.printStackTrace();
 		}
 
+	}
+	
+	
+	// TODO refactor these 3 methods into one method with a String parameter
+	private String fetchAddressingIdFromSitOPTCallbackEndpoint(String sitOptCallbackEndpoint){
+		// we gonna fetch the CallbackEndpoint part
+		// http://192.168.209.224:8080/srsTestService/rest/callback?CorrelationId=someCorrelation123&AddressingId=null&CallbackEndpoint=http%3A%2F%2F192.168.209.224%3A9763%2Fservices%2FsrsServiceCallback
+		System.out.println("Fetching SitME Workflow AddressingId from " + sitOptCallbackEndpoint);
+		
+		String queryString = sitOptCallbackEndpoint.split("\\?")[1];
+		
+		String addressingIdStringDirty = queryString.split("AddressingId=")[1];
+
+		String addressingIdString = addressingIdStringDirty.substring(0, addressingIdStringDirty.indexOf("&"));
+		
+		return addressingIdString;
+		
+	}
+	
+	private String fetchCorrelationFromSitOPTCallbackEndpoint(String sitOptCallbackEndpoint){
+		// we gonna fetch the CallbackEndpoint part
+		// http://192.168.209.224:8080/srsTestService/rest/callback?CorrelationId=someCorrelation123&AddressingId=null&CallbackEndpoint=http%3A%2F%2F192.168.209.224%3A9763%2Fservices%2FsrsServiceCallback
+		System.out.println("Fetching SitME Workflow CorrelationID from " + sitOptCallbackEndpoint);
+		
+		String queryString = sitOptCallbackEndpoint.split("\\?")[1];
+		
+		String correlationIdStringDirty = queryString.split("CorrelationId=")[1];
+		
+		String correlationIdString = correlationIdStringDirty.substring(0, correlationIdStringDirty.indexOf("&"));
+
+		return correlationIdString;
+		
+	}
+	
+	private String fetchEndpointFromSitOPTCallbackEndpoint(String sitOptCallbackEndpoint){
+		// we gonna fetch the CallbackEndpoint part
+		// http://192.168.209.224:8080/srsTestService/rest/callback?CorrelationId=someCorrelation123&AddressingId=null&CallbackEndpoint=http%3A%2F%2F192.168.209.224%3A9763%2Fservices%2FsrsServiceCallback
+		System.out.println("Fetching SitME Workflow callbackEndpoint from " + sitOptCallbackEndpoint);
+		
+		String queryString = sitOptCallbackEndpoint.split("\\?")[1];
+		
+		String encodedCallbackEndpointString = queryString.split("CallbackEndpoint=")[1];
+
+		String decodedCallbackEndpointString = URLDecoder.decode(encodedCallbackEndpointString);
+	
+		System.out.println("Found following Endpoint: " + decodedCallbackEndpointString);
+		return decodedCallbackEndpointString;
+		
 	}
 
 }
