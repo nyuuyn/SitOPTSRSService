@@ -8,6 +8,7 @@ import iaas.uni.stuttgart.de.srs.model.Subscription;
 import net.sf.json.JSONObject;
 
 import java.io.IOException;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,32 +38,81 @@ public class SubscriptionDataSource {
 	public List<Subscription> getSubscriptions() {
 		List<Subscription> subs = new ArrayList<Subscription>();
 
-		SituationTemplateDataSource sitTempDataSource = new SituationTemplateDataSource();
-		List<SituationTemplate> sitTemplates = sitTempDataSource.getSituationTemplates();
-
 		SituationDataSource sitDataSource = new SituationDataSource();
 		List<Situation> sits = sitDataSource.getSituations();
 
 		SituationChangeDataSource sitChangeDataSource = new SituationChangeDataSource();
 		List<SituationChange> sitChanges = sitChangeDataSource.getSituationChanges();
 
-		for (Situation sit : sits) {
-			String sitId = sit.getId();
-			String thingId = sit.getThing();
-			String sitTempId = sit.getSituationTemplate();
-			String callbackUrl = null;
-			for (SituationChange sitChange : sitChanges) {
-				if (sitChange.getId().equals(sitId)) {
-					callbackUrl = sitChange.getCallbackUrl();
+		
+		for(SituationChange sitChange : sitChanges){
+			String sitOpt2srsCallbackEndpoint = sitChange.getCallbackUrl();
+			
+			String sitMeCallbackEndpoint = this.fetchEndpointFromSitOPTCallbackEndpoint(sitOpt2srsCallbackEndpoint);
+			String correlationId = this.fetchCorrelationFromSitOPTCallbackEndpoint(sitOpt2srsCallbackEndpoint);
+			String addressingId = this.fetchAddressingIdFromSitOPTCallbackEndpoint(sitOpt2srsCallbackEndpoint);
+			String sitTemplateId = null;
+			String thingId= null;
+			
+			for(Situation sit : sits){
+				if(sitChange.getId().equals(sit.getId())){
+					sitTemplateId = sit.getSituationTemplate();
+					thingId = sit.getThing();
+					break;
 				}
-				Subscription sub = new Subscription(sitTempId, thingId, null, callbackUrl, null);
-
-				subs.add(sub);
 			}
-
+			
+			subs.add(new Subscription(sitTemplateId, thingId, correlationId, sitMeCallbackEndpoint, addressingId));
+			
 		}
 
 		return subs;
+	}
+	
+	private String fetchAddressingIdFromSitOPTCallbackEndpoint(String sitOptCallbackEndpoint){
+		// we gonna fetch the CallbackEndpoint part
+		// http://192.168.209.224:8080/srsTestService/rest/callback?CorrelationId=someCorrelation123&AddressingId=null&CallbackEndpoint=http%3A%2F%2F192.168.209.224%3A9763%2Fservices%2FsrsServiceCallback
+		System.out.println("Fetching SitME Workflow AddressingId from " + sitOptCallbackEndpoint);
+		
+		String queryString = sitOptCallbackEndpoint.split("?")[1];
+		
+		String addressingIdStringDirty = queryString.split("AddressingId=")[1];
+
+		String addressingIdString = addressingIdStringDirty.substring(0, addressingIdStringDirty.indexOf("&"));
+		
+		return addressingIdString;
+		
+	}
+	
+	private String fetchCorrelationFromSitOPTCallbackEndpoint(String sitOptCallbackEndpoint){
+		// we gonna fetch the CallbackEndpoint part
+		// http://192.168.209.224:8080/srsTestService/rest/callback?CorrelationId=someCorrelation123&AddressingId=null&CallbackEndpoint=http%3A%2F%2F192.168.209.224%3A9763%2Fservices%2FsrsServiceCallback
+		System.out.println("Fetching SitME Workflow CorrelationID from " + sitOptCallbackEndpoint);
+		
+		String queryString = sitOptCallbackEndpoint.split("?")[1];
+		
+		String correlationIdStringDirty = queryString.split("CorrelationId=")[1];
+		
+		String correlationIdString = correlationIdStringDirty.substring(0, correlationIdStringDirty.indexOf("&"));
+
+		return correlationIdString;
+		
+	}
+	
+	private String fetchEndpointFromSitOPTCallbackEndpoint(String sitOptCallbackEndpoint){
+		// we gonna fetch the CallbackEndpoint part
+		// http://192.168.209.224:8080/srsTestService/rest/callback?CorrelationId=someCorrelation123&AddressingId=null&CallbackEndpoint=http%3A%2F%2F192.168.209.224%3A9763%2Fservices%2FsrsServiceCallback
+		System.out.println("Fetching SitME Workflow callbackEndpoint from " + sitOptCallbackEndpoint);
+		
+		String queryString = sitOptCallbackEndpoint.split("?")[1];
+		
+		String encodedCallbackEndpointString = queryString.split("CallbackEndpoint=")[1];
+
+		String decodedCallbackEndpointString = URLDecoder.decode(encodedCallbackEndpointString);
+	
+		System.out.println("Found following Endpoint: " + decodedCallbackEndpointString);
+		return decodedCallbackEndpointString;
+		
 	}
 
 	public void addSubscription(Subscription sub) {
