@@ -4,6 +4,7 @@
 package iaas.uni.stuttgart.de.srs.resources;
 
 import java.io.IOException;
+import java.util.Collections;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -43,6 +44,19 @@ public class CallbackResource extends RESTResource {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
+		System.out.println("HTTPServletRequest: ");
+
+		System.out.println("Params:");
+		for (Object paramName : Collections.list(httpRequest.getParameterNames())) {
+			System.out.println("ParamKey: " + paramName);
+			for (int i = 0; i < httpRequest.getParameterValues((String) paramName).length; i++) {
+				System.out.println("ParamValue: " + httpRequest.getParameterValues((String) paramName)[i]);
+			}
+
+		}
+
+		System.out.println("QueryString: " + httpRequest.getQueryString());
 
 		// this.getSub(situation, object, correlationId, endpoint)
 
