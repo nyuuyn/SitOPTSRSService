@@ -57,12 +57,8 @@ public class CallbackResource extends RESTResource {
 		System.out.println("Parsed JSON body: ");
 		System.out.println(jsonBody);
 
-		System.out.println("HTTPServletRequest: ");
 
-		System.out.println("Params:");
 		for (Object paramName : Collections.list(httpRequest.getParameterNames())) {
-			System.out.println("ParamKey: " + paramName);
-
 			if (httpRequest.getParameterValues((String) paramName).length != 1) {
 				continue;
 			}

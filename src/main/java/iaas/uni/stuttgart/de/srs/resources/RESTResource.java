@@ -23,18 +23,21 @@ import iaas.uni.stuttgart.de.srs.model.Subscription;
 public abstract class RESTResource {
 
 	public void notifyService(Subscription sub) {
+		System.out.println("Preparing NotifyRequest");
+
 		URL serviceUrl = null;
 		try {
-			serviceUrl = new URL(
-					(sub.getEndpoint().endsWith("/") ? sub.getEndpoint().substring(0, sub.getEndpoint().lastIndexOf("/")) : sub.getEndpoint()) + "?wsdl");
+			serviceUrl = new URL((sub.getEndpoint().endsWith("/")
+					? sub.getEndpoint().substring(0, sub.getEndpoint().lastIndexOf("/")) : sub.getEndpoint())
+					+ "?wsdl");
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		}
-	
-		System.out.println("Preparing NotifyRequest to " + serviceUrl);
-		
+
+		System.out.println("NotifyRequest will be sent to " + serviceUrl);
+
 		// TODO set addressing
-	
+
 		// AddressingProperties maps = new AddressingProperties();
 		// EndpointReferenceType ref = new EndpointReferenceType();
 		// AttributedURIType add = new AttributedURIType();
@@ -47,46 +50,45 @@ public abstract class RESTResource {
 		//
 		// ((BindingProvider)port).getRequestContext()
 		// .put("javax.xml.ws.addressing.context", maps);
-	
+
 		SrsServiceCallback service = new SrsServiceCallback(serviceUrl, new WSAddressingFeature());
 		// SrsServiceCallback service = new SrsServiceCallback(serviceUrl);
-	
+
 		AddressingProperties maps = new AddressingProperties();
-	
+
 		maps.setMessageID(null);
 		maps.setTo(new EndpointReferenceType());
 		maps.setReplyTo(null);
-	
+
 		// EndpointReferenceType epr = new EndpointReferenceType();
 		// AttributedURIType uri = new AttributedURIType();
 		// uri.setValue(serviceUrl.toString());
 		// epr.setAddress(uri);
 		// maps.setTo(epr);
-	
+
 		RelatesToType relatesTo = new RelatesToType();
-	
+
 		relatesTo.setValue(sub.getAddrMsgId());
 		maps.setRelatesTo(relatesTo);
-	
+
 		SrsServiceNotifciation notifyService = service.getSrsCallbackServiceSOAP();
-	
+
 		((BindingProvider) notifyService).getRequestContext().put("javax.xml.ws.addressing.context", maps);
-	
-		
+
 		System.out.println("NotifyRequest contains following values: ");
 		System.out.println("Situation: " + sub.getSituationTemplateId());
 		System.out.println("Thing: " + sub.getThingId());
 		System.out.println("Correlation: " + sub.getCorrelation());
-		
+
 		NotifyRequest notifyReq = new NotifyRequest();
-	
+
 		notifyReq.setSituation(sub.getSituationTemplateId());
 		notifyReq.setObject(sub.getThingId());
 		notifyReq.setCorrelation(sub.getCorrelation());
-	
+
 		notifyService.notify(notifyReq);
 	}
-	
+
 	public Subscription getSub(String situation, String object, String correlation, String endpoint) {
 		SubscriptionDataSource subData = new SubscriptionDataSource();
 
