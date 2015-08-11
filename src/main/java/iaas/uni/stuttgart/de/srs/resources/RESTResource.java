@@ -31,6 +31,8 @@ public abstract class RESTResource {
 			e.printStackTrace();
 		}
 	
+		System.out.println("Preparing NotifyRequest to " + serviceUrl);
+		
 		// TODO set addressing
 	
 		// AddressingProperties maps = new AddressingProperties();
@@ -70,6 +72,12 @@ public abstract class RESTResource {
 	
 		((BindingProvider) notifyService).getRequestContext().put("javax.xml.ws.addressing.context", maps);
 	
+		
+		System.out.println("NotifyRequest contains following values: ");
+		System.out.println("Situation: " + sub.getSituationTemplateId());
+		System.out.println("Thing: " + sub.getThingId());
+		System.out.println("Correlation: " + sub.getCorrelation());
+		
 		NotifyRequest notifyReq = new NotifyRequest();
 	
 		notifyReq.setSituation(sub.getSituationTemplateId());
