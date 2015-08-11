@@ -18,6 +18,10 @@ import javax.ws.rs.core.Response;
 
 import org.apache.cxf.helpers.IOUtils;
 
+import net.sf.json.JSON;
+import net.sf.json.JSONObject;
+import net.sf.json.JSONSerializer;
+
 /**
  * @author kepeskn
  *
@@ -26,37 +30,59 @@ public class CallbackResource extends RESTResource {
 
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response callback(@QueryParam("CorrelationId") String correlationId,
-			@PathParam("AddressingId") String addressingId,
-			@PathParam("CallbackEndpoint") String callbackEndpointEncoded, @Context HttpServletRequest httpRequest) {
+	public Response callback(@Context HttpServletRequest httpRequest) {
 
 		// http://host:port/srsService/rest/callback/{correlationId}/{addressingId}/{sitMeProcessCallbackAddressEncoded}
 		// TODO Callback to SitME Process
 
 		System.out.println("CallbackResource#callback called with: ");
-		System.out.println("CorrelationId: " + correlationId);
-		System.out.println("AddressingId: " + addressingId);
-		System.out.println("CallbackEndpoint: " + callbackEndpointEncoded);
-
+		String body = null;
 		try {
-			String body = IOUtils.readStringFromStream(httpRequest.getInputStream());
-			System.out.println("Body: \n" + body);
+			body = IOUtils.readStringFromStream(httpRequest.getInputStream());
+			System.out.println("Raw-Body: \n" + body);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		JSON jsonBody = JSONSerializer.toJSON(body);
+		
+		System.out.println("Parsed JSON body: ");
+		System.out.println(jsonBody);
+
+		String callbackEndpoint = null;
+		String addressingId = null;
+		String correlationId = null;
 
 		System.out.println("HTTPServletRequest: ");
 
 		System.out.println("Params:");
 		for (Object paramName : Collections.list(httpRequest.getParameterNames())) {
 			System.out.println("ParamKey: " + paramName);
-			for (int i = 0; i < httpRequest.getParameterValues((String) paramName).length; i++) {
-				System.out.println("ParamValue: " + httpRequest.getParameterValues((String) paramName)[i]);
+
+			if (httpRequest.getParameterValues((String) paramName).length != 1) {
+				continue;
+			}
+
+			switch (((String) paramName)) {
+			case "CorrelationId":
+				correlationId = httpRequest.getParameterValues(((String) paramName))[0];
+				break;
+			case "AddressingId":
+				addressingId = httpRequest.getParameterValues(((String) paramName))[0];
+				break;
+			case "CallbackEndpoint":
+				callbackEndpoint = httpRequest.getParameterValues(((String) paramName))[0];
+				break;
+			default:
+				break;
 			}
 
 		}
 
-		System.out.println("QueryString: " + httpRequest.getQueryString());
+		System.out.println("Found following query values: ");
+		System.out.println("CorrelationId: " + correlationId);
+		System.out.println("AddressingId: " + addressingId);
+		System.out.println("CallbackEndpoint: " + callbackEndpoint);
 
 		// this.getSub(situation, object, correlationId, endpoint)
 
