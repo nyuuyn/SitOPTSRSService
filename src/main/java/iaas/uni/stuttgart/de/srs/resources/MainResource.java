@@ -1,8 +1,6 @@
 package iaas.uni.stuttgart.de.srs.resources;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Map;
 
 import iaas.uni.stuttgart.de.srs.data.rest.MainResourceDAO;
@@ -26,22 +24,14 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
-import javax.xml.ws.BindingProvider;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
-import org.apache.cxf.ws.addressing.AddressingProperties;
-import org.apache.cxf.ws.addressing.EndpointReferenceType;
-import org.apache.cxf.ws.addressing.RelatesToType;
-import org.apache.cxf.ws.addressing.WSAddressingFeature;
 import org.glassfish.jersey.server.mvc.Viewable;
 
-import de.uni_stuttgart.iaas.srsservice.NotifyRequest;
 import de.uni_stuttgart.iaas.srsservice.SrsService;
-import de.uni_stuttgart.iaas.srsservice.SrsServiceCallback;
-import de.uni_stuttgart.iaas.srsservice.SrsServiceNotifciation;
 import de.uni_stuttgart.iaas.srsservice.SrsServiceNotifciation_SrsCallbackServiceSOAP_Client;
 import de.uni_stuttgart.iaas.srsservice.SrsService_Service;
 import de.uni_stuttgart.iaas.srsservice.SubscribeRequest;
@@ -50,29 +40,30 @@ import de.uni_stuttgart.iaas.srsservice.SubscribeRequest;
  * @author Kalman Kepes - kepeskn@studi.informatik.uni-stuttgart.de
  */
 @Path("/rest")
-public class MainResource {
-	
+public class MainResource extends RESTResource{
+
 	public MainResource() {
 		LoggingInInterceptor loggingInInterceptor = new LoggingInInterceptor();
 		loggingInInterceptor.setPrettyLogging(true);
 		LoggingOutInterceptor loggingOutInterceptor = new LoggingOutInterceptor();
 		loggingOutInterceptor.setPrettyLogging(true);
-		
-		Bus factory =org.apache.cxf.BusFactory.newInstance().getDefaultBus();
+
+		Bus factory = org.apache.cxf.BusFactory.newInstance().getDefaultBus();
 		factory.getInInterceptors().add(loggingInInterceptor);
 		factory.getOutInterceptors().add(loggingOutInterceptor);
 
 	}
-	
+
 	@Path("/callback")
-	public CallbackResource getCallbackResource(){
+	public CallbackResource getCallbackResource() {
 		return new CallbackResource();
 	}
 
 	@GET
 	@Produces(MediaType.TEXT_HTML)
 	public Response root() {
-		Viewable view = new Viewable("index", new MainResourceDAO(new ThingDataSource(), new SituationTemplateDataSource(), new SubscriptionDataSource()));
+		Viewable view = new Viewable("index", new MainResourceDAO(new ThingDataSource(),
+				new SituationTemplateDataSource(), new SubscriptionDataSource()));
 		return Response.ok(view).build();
 	}
 
@@ -83,21 +74,19 @@ public class MainResource {
 		// pretty hacky method, but works
 
 		try {
-			String body = IOUtils.readStringFromStream(httpRequest
-					.getInputStream());
+			String body = IOUtils.readStringFromStream(httpRequest.getInputStream());
 			System.out.println("updateObject called with Body: \n" + body);
 
 			String[] params = body.split("&");
 
 			if (!params[0].contains("objectId")) {
-				return Response.status(Status.BAD_REQUEST)
-						.entity("Request misses objectId param").build();
+				return Response.status(Status.BAD_REQUEST).entity("Request misses objectId param").build();
 			}
 
 			String objectId = params[0].split("=")[1];
 
 			ThingDataSource objData = new ThingDataSource();
-			
+
 			for (Thing obj : objData.getThings()) {
 				if (obj.getId().equals(objectId)) {
 					System.out.println("Found object: " + objectId);
@@ -105,8 +94,7 @@ public class MainResource {
 						String propKey = params[i].split("=")[0];
 						String propVal = params[i].split("=")[1];
 
-						obj.getProperties().put(propKey,
-								Boolean.valueOf(propVal));
+						obj.getProperties().put(propKey, Boolean.valueOf(propVal));
 					}
 				}
 			}
@@ -121,96 +109,21 @@ public class MainResource {
 
 	@POST
 	@Produces(MediaType.TEXT_HTML)
-	public Response notify(@FormParam("Situation") String situation,
-			@FormParam("Object") String object,
-			@FormParam("Correlation") String correlation,
-			@FormParam("Endpoint") String endpoint) {
+	public Response notify(@FormParam("Situation") String situation, @FormParam("Object") String object,
+			@FormParam("Correlation") String correlation, @FormParam("Endpoint") String endpoint) {
 
-		System.out.println("Called Notify (" + situation + "," + object + ","
-				+ correlation + "," + endpoint + ")");
-
-		URL serviceUrl = null;
-		try {
-			serviceUrl = new URL((endpoint.endsWith("/") ? endpoint.substring(
-					0, endpoint.lastIndexOf("/")) : endpoint) + "?wsdl");
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		}
+		System.out.println("Called Notify (" + situation + "," + object + "," + correlation + "," + endpoint + ")");
 
 		// find subscription
-		Subscription sub = this
-				.getSub(situation, object, correlation, endpoint);
-
-		// TODO set addressing
-
-		// AddressingProperties maps = new AddressingProperties();
-		// EndpointReferenceType ref = new EndpointReferenceType();
-		// AttributedURIType add = new AttributedURIType();
-		// add.setValue("http://localhost:9090/decoupled_endpoint");
-		// RelatesToType relatesTo = new RelatesToType();
-		// relatesTo.setValue(value);
-		// maps.setRelatesTo(rel);
-		// maps.setReplyTo(ref);
-		// maps.setFaultTo(ref);
-		//
-		// ((BindingProvider)port).getRequestContext()
-		// .put("javax.xml.ws.addressing.context", maps);
+		Subscription sub = this.getSub(situation, object, correlation, endpoint);
 
 		
+		this.notifyService(sub);
 		
-		SrsServiceCallback service = new SrsServiceCallback(serviceUrl, new WSAddressingFeature());
-//		SrsServiceCallback service = new SrsServiceCallback(serviceUrl);
-		
-		AddressingProperties maps = new AddressingProperties();
-		
-		maps.setMessageID(null);
-		maps.setTo(new EndpointReferenceType());
-		maps.setReplyTo(null);
-		
-
-//		EndpointReferenceType epr = new EndpointReferenceType();
-//		AttributedURIType uri = new AttributedURIType();
-//		uri.setValue(serviceUrl.toString());
-//		epr.setAddress(uri);
-//		maps.setTo(epr);
-		
-		RelatesToType relatesTo = new RelatesToType();
-		
-		relatesTo.setValue(sub.getAddrMsgId());
-		maps.setRelatesTo(relatesTo);
-		
-		SrsServiceNotifciation notifyService = service
-				.getSrsCallbackServiceSOAP();		
-		
-		((BindingProvider) notifyService).getRequestContext().put(
-				"javax.xml.ws.addressing.context", maps);
-
-		NotifyRequest notifyReq = new NotifyRequest();
-		
-		
-
-		notifyReq.setSituation(situation);
-		notifyReq.setObject(object);
-		notifyReq.setCorrelation(correlation);
-
-		notifyService.notify(notifyReq);
-
-		Viewable view = new Viewable("index", new MainResourceDAO( new ThingDataSource(), new SituationTemplateDataSource(), new SubscriptionDataSource()));
+		Viewable view = new Viewable("index", new MainResourceDAO(new ThingDataSource(),
+				new SituationTemplateDataSource(), new SubscriptionDataSource()));
 		return Response.ok(view).build();
 	}
 
-	private Subscription getSub(String situation, String object,
-			String correlation, String endpoint) {
-		SubscriptionDataSource subData = new SubscriptionDataSource();
-		
-		for (Subscription sub : subData.getSubscriptions()) {
-			if (sub.getSituationTemplateId().equals(situation)
-					&& sub.getThingId().equals(object)
-					&& sub.getCorrelation().equals(correlation)
-					&& sub.getEndpoint().equals(endpoint)) {
-				return sub;
-			}
-		}
-		return null;
-	}
+	
 }
