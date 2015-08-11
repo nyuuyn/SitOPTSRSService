@@ -92,11 +92,40 @@ public abstract class RESTResource {
 	public Subscription getSub(String situation, String object, String correlation, String endpoint) {
 		SubscriptionDataSource subData = new SubscriptionDataSource();
 
+		System.out.println("Looking for Subscription with: ");
+		System.out.println("Situation: " + situation);
+		System.out.println("Thing: " + object);
+		System.out.println("Correlation: " + correlation);
+		System.out.println("Endpoint: " + endpoint);
+		
+		System.out.println("Found following Subs");
 		for (Subscription sub : subData.getSubscriptions()) {
-			if (sub.getSituationTemplateId().equals(situation) && sub.getThingId().equals(object)
-					&& sub.getCorrelation().equals(correlation) && sub.getEndpoint().equals(endpoint)) {
-				return sub;
+			System.out.println("Sub: ");
+			System.out.println(sub.toString());
+			
+			// TODO SUPER ugly if, just for debugging right now
+			if(sub.getSituationTemplateId() != null && sub.getSituationTemplateId().equals(situation)){
+				if(sub.getThingId() != null && sub.getThingId().equals(object)){
+					if(sub.getCorrelation() != null && sub.getCorrelation().equals(correlation)){
+						if(sub.getEndpoint() != null && sub.getEndpoint().equals(endpoint)){
+							System.out.println("Found matching subscription");
+							return sub;
+						}
+									
+					} else {
+						continue;
+					}
+					
+					
+				} else {
+					continue;
+				}
+				
+				
+			} else {
+				continue;
 			}
+			
 		}
 		return null;
 	}
