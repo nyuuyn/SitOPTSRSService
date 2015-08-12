@@ -231,7 +231,7 @@ public class SrsServiceSOAPImpl implements SrsService {
 				}
 			}
 			
-			subData.removeSubscription(new Subscription(situationId, thingId, null, sitOpt2SrsCallbackEndpoint, null));
+			subData.removeSubscription(new Subscription(sitTemplate, thingId, null, sitOpt2SrsCallbackEndpoint, null));
 			
 		}
 	}
