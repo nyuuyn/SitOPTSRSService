@@ -123,6 +123,10 @@ public class SubscriptionDataSource {
 		// we gonna fetch the CallbackEndpoint part
 		// http://192.168.209.224:8080/srsTestService/rest/callback?CorrelationId=someCorrelation123&AddressingId=null&CallbackEndpoint=http%3A%2F%2F192.168.209.224%3A9763%2Fservices%2FsrsServiceCallback
 		System.out.println("Fetching SitME Workflow AddressingId from " + sitOptCallbackEndpoint);
+		if(!this.hasQuery(sitOptCallbackEndpoint)){
+			// this url doesn't seem to be using some query => not SRS callback endpoint
+			return null;
+		}
 		
 		String queryString = sitOptCallbackEndpoint.split("\\?")[1];
 		
@@ -137,6 +141,11 @@ public class SubscriptionDataSource {
 	private String fetchCorrelationFromSitOPTCallbackEndpoint(String sitOptCallbackEndpoint){
 		// we gonna fetch the CallbackEndpoint part
 		// http://192.168.209.224:8080/srsTestService/rest/callback?CorrelationId=someCorrelation123&AddressingId=null&CallbackEndpoint=http%3A%2F%2F192.168.209.224%3A9763%2Fservices%2FsrsServiceCallback
+		if(!this.hasQuery(sitOptCallbackEndpoint)){
+			// this url doesn't seem to be using some query => not SRS callback endpoint
+			return null;
+		}
+		
 		System.out.println("Fetching SitME Workflow CorrelationID from " + sitOptCallbackEndpoint);
 		
 		String queryString = sitOptCallbackEndpoint.split("\\?")[1];
@@ -150,6 +159,12 @@ public class SubscriptionDataSource {
 	}
 	
 	private String fetchEndpointFromSitOPTCallbackEndpoint(String sitOptCallbackEndpoint){
+		
+		if(!this.hasQuery(sitOptCallbackEndpoint)){
+			// this url doesn't seem to be using some query => not SRS callback endpoint
+			return null;
+		}
+		
 		// we gonna fetch the CallbackEndpoint part
 		// http://192.168.209.224:8080/srsTestService/rest/callback?CorrelationId=someCorrelation123&AddressingId=null&CallbackEndpoint=http%3A%2F%2F192.168.209.224%3A9763%2Fservices%2FsrsServiceCallback
 		System.out.println("Fetching SitME Workflow callbackEndpoint from " + sitOptCallbackEndpoint);
@@ -163,6 +178,14 @@ public class SubscriptionDataSource {
 		System.out.println("Found following Endpoint: " + decodedCallbackEndpointString);
 		return decodedCallbackEndpointString;
 		
+	}
+	
+	private boolean hasQuery(String url){
+		if(url.split("\\?").length == 2){
+			return true;
+		} else{
+			return false;
+		}
 	}
 
 }
