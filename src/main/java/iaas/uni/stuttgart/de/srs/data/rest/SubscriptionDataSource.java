@@ -23,6 +23,7 @@ import javax.ws.rs.client.WebTarget;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -69,9 +70,34 @@ public class SubscriptionDataSource {
 		return subs;
 	}
 	
-	
+	public void removeSubscription(Subscription sub){
+		
+		// the address of SitOPT
+				String sitOptAddr = new Configuration().getSitOPTAddress() + "/situations/changes?SitTempID="
+						+ sub.getSituationTemplateId() + "&ThingID=" + sub.getThingId() + "&CallbackURL="
+						+ URLEncoder.encode(sub.getEndpoint());
+		
+		CloseableHttpClient httpclient = HttpClients.createDefault();
+
+		HttpDelete post = new HttpDelete(sitOptAddr);
+		post.addHeader("Accept", "application/json");
+
+		try {
+			CloseableHttpResponse response1 = httpclient.execute(post);
+			String responseAsString = IOUtils.readStringFromStream(response1.getEntity().getContent());
+
+			System.out.println("Sent DELETE to " + sitOptAddr);
+			System.out.println("ResponseBody: " + responseAsString);
+
+		} catch (ClientProtocolException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
 	public void addSubscription(Subscription sub) {
+		
 
 		// This is the address SitOPT should use as callback
 		
@@ -158,7 +184,7 @@ public class SubscriptionDataSource {
 		
 	}
 	
-	private String fetchEndpointFromSitOPTCallbackEndpoint(String sitOptCallbackEndpoint){
+	public String fetchEndpointFromSitOPTCallbackEndpoint(String sitOptCallbackEndpoint){
 		
 		if(!this.hasQuery(sitOptCallbackEndpoint)){
 			// this url doesn't seem to be using some query => not SRS callback endpoint

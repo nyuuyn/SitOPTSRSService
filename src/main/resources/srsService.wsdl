@@ -81,6 +81,14 @@
 					</xsd:sequence>
 				</xsd:complexType>
 			</xsd:element>
+			
+			<xsd:element name="UnsubscribeRequest">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="MultiUnsubscription" type="tns:MultiSubscribeRequestType" minOccurs="1" maxOccurs="1"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
 
 			<xsd:complexType name="MultiSubscribeRequestType">
 				<xsd:sequence>
@@ -148,6 +156,10 @@
 	<wsdl:message name="SubscribeSituationRequest">
 		<wsdl:part element="tns:SubscribeRequest" name="parameters" />
 	</wsdl:message>
+	
+	<wsdl:message name="UnsubscribeSituationRequest">
+		<wsdl:part element="tns:UnsubscribeRequest" name="parameters"/>
+	</wsdl:message>
 
 	<wsdl:message name="NotifySituationRequest">
 		<wsdl:part element="tns:NotifyRequest" name="parameters" />
@@ -160,6 +172,10 @@
 		</wsdl:operation>
 		<wsdl:operation name="Subscribe">
 			<wsdl:input message="tns:SubscribeSituationRequest" />
+		</wsdl:operation>
+		
+		<wsdl:operation name="Unsubscribe">
+			<wsdl:input message="tns:UnsubscribeSituationRequest"/>
 		</wsdl:operation>
 	</wsdl:portType>
 
@@ -186,6 +202,12 @@
 				soapAction="http://www.iaas.uni-stuttgart.de/srsService/Subscribe" />
 			<wsdl:input>
 				<soap:body use="literal" />
+			</wsdl:input>
+		</wsdl:operation>
+		<wsdl:operation name="Unsubscribe">
+			<soap:operation soapAction="http://www.iaas.uni-stuttgart.de/srsService/Unsubscribe"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
 			</wsdl:input>
 		</wsdl:operation>
 	</wsdl:binding>
