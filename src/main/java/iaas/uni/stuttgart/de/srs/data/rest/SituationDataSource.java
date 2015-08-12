@@ -44,6 +44,9 @@ public class SituationDataSource {
 			sits.add(sit);
 
 		}
+		
+		System.out.println("Fetched Situations from SitOPT Service");
+		System.out.println(jsonOutput);
 
 		return sits;
 	}
