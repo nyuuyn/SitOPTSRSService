@@ -10,6 +10,7 @@ public class Situation {
 		this.id = id;
 		this.thing = thing;
 		this.situationTemplate = situationTemplate;
+		this.occured = occured;
 	}
 	
 	public String getId() {
