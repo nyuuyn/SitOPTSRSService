@@ -224,14 +224,12 @@ public class SrsServiceSOAPImpl implements SrsService {
 			for(SituationChange sitChange : sitChangeData.getSituationChanges()){
 				if(sitChange.getId().equals(situationId)){
 					// if the subscription at SitOPT contains the given Endpoint from the multiunsub, we have a hit
-					if(new SubscriptionDataSource().fetchEndpointFromSitOPTCallbackEndpoint(sitChange.getCallbackUrl()).equals(parameters.getMultiUnsubscription().getEndpoint())){
+					if(subData.fetchEndpointFromSitOPTCallbackEndpoint(sitChange.getCallbackUrl()) != null && subData.fetchEndpointFromSitOPTCallbackEndpoint(sitChange.getCallbackUrl()).equals(parameters.getMultiUnsubscription().getEndpoint())){
 						sitOpt2SrsCallbackEndpoint = sitChange.getCallbackUrl();
 						break;
 					}
 				}
 			}
-			
-			
 			
 			subData.removeSubscription(new Subscription(situationId, thingId, null, sitOpt2SrsCallbackEndpoint, null));
 			
