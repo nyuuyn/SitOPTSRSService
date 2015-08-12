@@ -6,9 +6,11 @@
 package iaas.uni.stuttgart.de.srs.service.impl;
 
 import iaas.uni.stuttgart.de.srs.data.rest.ThingDataSource;
+import iaas.uni.stuttgart.de.srs.data.rest.SituationDataSource;
 import iaas.uni.stuttgart.de.srs.data.rest.SituationTemplateDataSource;
 import iaas.uni.stuttgart.de.srs.data.rest.SubscriptionDataSource;
 import iaas.uni.stuttgart.de.srs.model.Thing;
+import iaas.uni.stuttgart.de.srs.model.Situation;
 import iaas.uni.stuttgart.de.srs.model.SituationTemplate;
 import iaas.uni.stuttgart.de.srs.model.Subscription;
 
@@ -147,20 +149,32 @@ public class SrsServiceSOAPImpl implements SrsService {
 				String situationId = situationEvent.getSituation();
 				String objId = situationEvent.getObject();
 
-				Thing requestedObj = null;
 				ThingDataSource objData = new ThingDataSource();
-				SituationTemplateDataSource sitData = new SituationTemplateDataSource();
+				SituationTemplateDataSource sitTemplateData = new SituationTemplateDataSource();
+				SituationDataSource sitData = new SituationDataSource();
+
+				Thing requestedObj = null;
+				SituationTemplate requestedSituation = null;
+				Situation targetedSituation = null;
 				
 				for (Thing obsObj : objData.getThings()) {
 					if (objId.equals(obsObj.getId())) {
 						requestedObj = obsObj;
+						break;
 					}
 				}
 
-				SituationTemplate requestedSituation = null;
-				for (SituationTemplate situation : sitData.getSituationTemplates()) {
+				for (SituationTemplate situation : sitTemplateData.getSituationTemplates()) {
 					if (situationId.equals(situation.getId())) {
 						requestedSituation = situation;
+						break;
+					}
+				}
+				
+				for(Situation sit : sitData.getSituations()){
+					if(sit.getSituationTemplate().equals(requestedSituation.getId()) && sit.getThing().equals(requestedObj.getId())){
+						targetedSituation = sit;
+						break;
 					}
 				}
 
@@ -181,8 +195,7 @@ public class SrsServiceSOAPImpl implements SrsService {
 				sitStatus.setSituationId(situationId);
 				sitStatus.setObjectId(objId);
 				sitStatus.setPropertyMap(props);
-				sitStatus.setTriggered(requestedSituation
-						.isTriggered(requestedObj));
+				sitStatus.setTriggered(targetedSituation.getOccured());
 
 				_return.getSituation().add(sitStatus);
 			}

@@ -4,8 +4,9 @@ public class Situation {
 	private String id;
 	private String thing;
 	private String situationTemplate;
+	private boolean occured;
 
-	public Situation(String id, String thing, String situationTemplate){
+	public Situation(String id, String thing, String situationTemplate, boolean occured){
 		this.id = id;
 		this.thing = thing;
 		this.situationTemplate = situationTemplate;
@@ -21,5 +22,9 @@ public class Situation {
 
 	public String getSituationTemplate() {
 		return this.situationTemplate;
+	}
+	
+	public boolean getOccured(){
+		return this.occured;
 	}
 }

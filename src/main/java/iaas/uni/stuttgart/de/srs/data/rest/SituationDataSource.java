@@ -39,7 +39,7 @@ public class SituationDataSource {
 			JSONObject situationJson = jsonOutput.getJSONObject(i);
 
 			Situation sit = new Situation(situationJson.getString("_id"), situationJson.getString("thing"),
-					situationJson.getString("situationtemplate"));
+					situationJson.getString("situationtemplate"),situationJson.getBoolean("occured"));
 			
 			sits.add(sit);
 
