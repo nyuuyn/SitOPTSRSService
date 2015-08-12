@@ -204,7 +204,10 @@ public class SrsServiceSOAPImpl implements SrsService {
 		
 		SituationDataSource sitData = new SituationDataSource();
 		SituationChangeDataSource sitChangeData = new SituationChangeDataSource();
+		SubscriptionDataSource subData = new SubscriptionDataSource();
 		
+			
+		// TODO change this to use mostly the SubscriptionDataSource, should be possible
 		for(SubscribeRequestType2 sub : parameters.getMultiUnsubscription().getSubscriptions().getSubscription()){
 			String sitTemplate = sub.getSituation();
 			String thingId = sub.getObject();
@@ -220,9 +223,17 @@ public class SrsServiceSOAPImpl implements SrsService {
 			
 			for(SituationChange sitChange : sitChangeData.getSituationChanges()){
 				if(sitChange.getId().equals(situationId)){
-					
+					// if the subscription at SitOPT contains the given Endpoint from the multiunsub, we have a hit
+					if(new SubscriptionDataSource().fetchEndpointFromSitOPTCallbackEndpoint(sitChange.getCallbackUrl()).equals(parameters.getMultiUnsubscription().getEndpoint())){
+						sitOpt2SrsCallbackEndpoint = sitChange.getCallbackUrl();
+						break;
+					}
 				}
 			}
+			
+			
+			
+			subData.removeSubscription(new Subscription(situationId, thingId, null, sitOpt2SrsCallbackEndpoint, null));
 			
 		}
 	}
