@@ -17,6 +17,7 @@ import iaas.uni.stuttgart.de.srs.model.SituationTemplate;
 import iaas.uni.stuttgart.de.srs.model.Subscription;
 
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.annotation.Resource;
@@ -69,23 +70,23 @@ public class SrsServiceSOAPImpl implements SrsService {
 	public void subscribe(SubscribeRequest parameters) {
 		
 		LOG.info("Executing operation subscribe");
-		System.out.println(parameters);
+		LOG.log(Level.FINEST,parameters.toString());
 
-		System.out.println("Received MultiSubscribe");
+		LOG.log(Level.FINEST,"Received MultiSubscribe");
 		String msgId = null;
 		for (Header header : this.getHeaders()) {
 			Object o = header.getObject();
-			System.out.println(header.getName().toString());
+			LOG.log(Level.FINEST,header.getName().toString());
 
 			Node headerNode = (Node) header.getObject();
 			if (header.getName().toString()
 					.equals("{http://www.w3.org/2005/08/addressing}MessageID")) {
 				msgId = headerNode.getTextContent();
-				System.out.println("Found addressing msgId: " + msgId);
+				LOG.log(Level.FINEST,"Found addressing msgId: " + msgId);
 			}
 			
-			System.out.println("Header: " + headerNode.getLocalName());
-			System.out.println("Content: " + headerNode.getTextContent());
+			LOG.log(Level.FINEST,"Header: " + headerNode.getLocalName());
+			LOG.log(Level.FINEST,"Content: " + headerNode.getTextContent());
 		}
 
 		String correlation = parameters.getMultiSubscription().getCorrelation();
@@ -97,7 +98,7 @@ public class SrsServiceSOAPImpl implements SrsService {
 			Subscription subscription = new Subscription(sub.getSituation(),
 					sub.getObject(), correlation, endpoint, msgId);
 
-		 	System.out.println("Adding subscription: " + subscription.toString());
+		 	LOG.log(Level.FINEST,"Adding subscription: " + subscription.toString());
 		 			 	
 		 	SubscriptionDataSource subData = new SubscriptionDataSource();
 		 	
@@ -131,7 +132,7 @@ public class SrsServiceSOAPImpl implements SrsService {
 	public de.uni_stuttgart.iaas.srsservice.GetResponse get(
 			GetRequest parameters) {
 		LOG.info("Executing operation get");
-		System.out.println(parameters);
+		LOG.log(Level.FINEST,parameters.toString());
 		try {
 
 			de.uni_stuttgart.iaas.srsservice.GetResponse _return = new GetResponse();
@@ -231,7 +232,7 @@ public class SrsServiceSOAPImpl implements SrsService {
 				}
 			}
 			
-			subData.removeSubscription(new Subscription(situationId, thingId, null, sitOpt2SrsCallbackEndpoint, null));
+			subData.removeSubscription(new Subscription(sitTemplate, thingId, null, sitOpt2SrsCallbackEndpoint, null));
 			
 		}
 	}

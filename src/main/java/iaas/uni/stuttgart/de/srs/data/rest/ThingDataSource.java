@@ -2,6 +2,7 @@ package iaas.uni.stuttgart.de.srs.data.rest;
 
 import iaas.uni.stuttgart.de.srs.config.Configuration;
 import iaas.uni.stuttgart.de.srs.model.Thing;
+import iaas.uni.stuttgart.de.srs.service.impl.SrsServiceSOAPImpl;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
@@ -9,6 +10,8 @@ import net.sf.json.JSONSerializer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -21,6 +24,9 @@ import org.springframework.http.MediaType;
  *
  */
 public class ThingDataSource {
+	
+	private static final Logger LOG = Logger.getLogger(ThingDataSource.class
+			.getName());
 	
 	public List<Thing> getThings(){
 		Client client = ClientBuilder.newClient();
@@ -40,8 +46,8 @@ public class ThingDataSource {
 			
 		}
 		
-		System.out.println("Fetched Objects from SitOPT Service");
-		System.out.println(jsonOutput);
+		LOG.log(Level.FINEST,"Fetched Objects from SitOPT Service");
+		LOG.log(Level.FINEST,jsonOutput.toString());
 		
 		return objs;
 	}

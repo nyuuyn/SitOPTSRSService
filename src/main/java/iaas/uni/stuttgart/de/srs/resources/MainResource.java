@@ -2,6 +2,8 @@ package iaas.uni.stuttgart.de.srs.resources;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import iaas.uni.stuttgart.de.srs.data.rest.MainResourceDAO;
 import iaas.uni.stuttgart.de.srs.data.rest.ThingDataSource;
@@ -41,6 +43,9 @@ import de.uni_stuttgart.iaas.srsservice.SubscribeRequest;
  */
 @Path("/rest")
 public class MainResource extends RESTResource{
+	
+	private static final Logger LOG = Logger.getLogger(MainResource.class
+			.getName());
 
 	public MainResource() {
 		LoggingInInterceptor loggingInInterceptor = new LoggingInInterceptor();
@@ -75,7 +80,7 @@ public class MainResource extends RESTResource{
 
 		try {
 			String body = IOUtils.readStringFromStream(httpRequest.getInputStream());
-			System.out.println("updateObject called with Body: \n" + body);
+			LOG.log(Level.FINEST,"updateObject called with Body: \n" + body);
 
 			String[] params = body.split("&");
 
@@ -89,7 +94,7 @@ public class MainResource extends RESTResource{
 
 			for (Thing obj : objData.getThings()) {
 				if (obj.getId().equals(objectId)) {
-					System.out.println("Found object: " + objectId);
+					LOG.log(Level.FINEST,"Found object: " + objectId);
 					for (int i = 1; i < params.length; i++) {
 						String propKey = params[i].split("=")[0];
 						String propVal = params[i].split("=")[1];
@@ -112,7 +117,7 @@ public class MainResource extends RESTResource{
 	public Response notify(@FormParam("Situation") String situation, @FormParam("Object") String object,
 			@FormParam("Correlation") String correlation, @FormParam("Endpoint") String endpoint) {
 
-		System.out.println("Called Notify (" + situation + "," + object + "," + correlation + "," + endpoint + ")");
+		LOG.log(Level.FINEST,"Called Notify (" + situation + "," + object + "," + correlation + "," + endpoint + ")");
 
 		// find subscription
 		Subscription sub = this.getSub(situation, object, correlation, endpoint);

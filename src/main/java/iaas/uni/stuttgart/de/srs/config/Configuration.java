@@ -13,11 +13,18 @@ import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 
+import iaas.uni.stuttgart.de.srs.service.impl.SrsServiceSOAPImpl;
+
 public class Configuration {
+	
+	private static final Logger LOG = Logger.getLogger(Configuration.class
+			.getName());
 
 	private Properties getProperties() {
 		Properties prop = new Properties();
@@ -72,13 +79,14 @@ public class Configuration {
 	}
 
 	public void displayInterfaceInformation(NetworkInterface netint) throws SocketException {
-		System.out.println("Display name: " + netint.getDisplayName() + "\n");
-		System.out.println("Name: " + netint.getName() + "\n");
+		
+		LOG.log(Level.FINEST,"Display name: " + netint.getDisplayName() + "\n");
+		LOG.log(Level.FINEST,"Name: " + netint.getName() + "\n");
 		Enumeration<InetAddress> inetAddresses = netint.getInetAddresses();
 		for (InetAddress inetAddress : Collections.list(inetAddresses)) {
-			System.out.println("InetAddress: " + inetAddress + "\n");
+			LOG.log(Level.FINEST,"InetAddress: " + inetAddress + "\n");
 		}
-		System.out.println("\n");
+		LOG.log(Level.FINEST,"\n");
 	}
 
 }

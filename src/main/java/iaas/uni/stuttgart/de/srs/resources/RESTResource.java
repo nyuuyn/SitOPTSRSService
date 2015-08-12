@@ -2,6 +2,8 @@ package iaas.uni.stuttgart.de.srs.resources;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.ws.BindingProvider;
 
@@ -15,6 +17,7 @@ import de.uni_stuttgart.iaas.srsservice.SrsServiceCallback;
 import de.uni_stuttgart.iaas.srsservice.SrsServiceNotifciation;
 import iaas.uni.stuttgart.de.srs.data.rest.SubscriptionDataSource;
 import iaas.uni.stuttgart.de.srs.model.Subscription;
+import iaas.uni.stuttgart.de.srs.service.impl.SrsServiceSOAPImpl;
 
 /**
  * @author kepeskn
@@ -22,8 +25,11 @@ import iaas.uni.stuttgart.de.srs.model.Subscription;
  */
 public abstract class RESTResource {
 
+	private static final Logger LOG = Logger.getLogger(RESTResource.class
+			.getName());
+	
 	public void notifyService(Subscription sub) {
-		System.out.println("Preparing NotifyRequest");
+		LOG.log(Level.FINEST,"Preparing NotifyRequest");
 
 		URL serviceUrl = null;
 		try {
@@ -34,7 +40,7 @@ public abstract class RESTResource {
 			e.printStackTrace();
 		}
 
-		System.out.println("NotifyRequest will be sent to " + serviceUrl);
+		LOG.log(Level.FINEST,"NotifyRequest will be sent to " + serviceUrl);
 
 		// TODO set addressing
 
@@ -75,10 +81,10 @@ public abstract class RESTResource {
 
 		((BindingProvider) notifyService).getRequestContext().put("javax.xml.ws.addressing.context", maps);
 
-		System.out.println("NotifyRequest contains following values: ");
-		System.out.println("Situation: " + sub.getSituationTemplateId());
-		System.out.println("Thing: " + sub.getThingId());
-		System.out.println("Correlation: " + sub.getCorrelation());
+		LOG.log(Level.FINEST,"NotifyRequest contains following values: ");
+		LOG.log(Level.FINEST,"Situation: " + sub.getSituationTemplateId());
+		LOG.log(Level.FINEST,"Thing: " + sub.getThingId());
+		LOG.log(Level.FINEST,"Correlation: " + sub.getCorrelation());
 
 		NotifyRequest notifyReq = new NotifyRequest();
 
@@ -92,23 +98,23 @@ public abstract class RESTResource {
 	public Subscription getSub(String situation, String object, String correlation, String endpoint) {
 		SubscriptionDataSource subData = new SubscriptionDataSource();
 
-		System.out.println("Looking for Subscription with: ");
-		System.out.println("Situation: " + situation);
-		System.out.println("Thing: " + object);
-		System.out.println("Correlation: " + correlation);
-		System.out.println("Endpoint: " + endpoint);
+		LOG.log(Level.FINEST,"Looking for Subscription with: ");
+		LOG.log(Level.FINEST,"Situation: " + situation);
+		LOG.log(Level.FINEST,"Thing: " + object);
+		LOG.log(Level.FINEST,"Correlation: " + correlation);
+		LOG.log(Level.FINEST,"Endpoint: " + endpoint);
 		
-		System.out.println("Found following Subs");
+		LOG.log(Level.FINEST,"Found following Subs");
 		for (Subscription sub : subData.getSubscriptions()) {
-			System.out.println("Sub: ");
-			System.out.println(sub.toString());
+			LOG.log(Level.FINEST,"Sub: ");
+			LOG.log(Level.FINEST,sub.toString());
 			
 			// TODO SUPER ugly if, just for debugging right now
 			if(sub.getSituationTemplateId() != null && sub.getSituationTemplateId().equals(situation)){
 				if(sub.getThingId() != null && sub.getThingId().equals(object)){
 					if(sub.getCorrelation() != null && sub.getCorrelation().equals(correlation)){
 						if(sub.getEndpoint() != null && sub.getEndpoint().equals(endpoint)){
-							System.out.println("Found matching subscription");
+							LOG.log(Level.FINEST,"Found matching subscription");
 							return sub;
 						}
 									

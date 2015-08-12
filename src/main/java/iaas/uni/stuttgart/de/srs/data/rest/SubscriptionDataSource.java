@@ -5,6 +5,7 @@ import iaas.uni.stuttgart.de.srs.model.Situation;
 import iaas.uni.stuttgart.de.srs.model.SituationChange;
 import iaas.uni.stuttgart.de.srs.model.SituationTemplate;
 import iaas.uni.stuttgart.de.srs.model.Subscription;
+import iaas.uni.stuttgart.de.srs.service.impl.SrsServiceSOAPImpl;
 import net.sf.json.JSONObject;
 
 import java.io.IOException;
@@ -12,6 +13,8 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -35,6 +38,9 @@ import org.springframework.http.MediaType;
  *
  */
 public class SubscriptionDataSource {
+	
+	private static final Logger LOG = Logger.getLogger(SubscriptionDataSource.class
+			.getName());
 
 	public List<Subscription> getSubscriptions() {
 		List<Subscription> subs = new ArrayList<Subscription>();
@@ -86,8 +92,8 @@ public class SubscriptionDataSource {
 			CloseableHttpResponse response1 = httpclient.execute(post);
 			String responseAsString = IOUtils.readStringFromStream(response1.getEntity().getContent());
 
-			System.out.println("Sent DELETE to " + sitOptAddr);
-			System.out.println("ResponseBody: " + responseAsString);
+			LOG.log(Level.FINEST,"Sent DELETE to " + sitOptAddr);
+			LOG.log(Level.FINEST,"ResponseBody: " + responseAsString);
 
 		} catch (ClientProtocolException e) {
 			e.printStackTrace();
@@ -107,8 +113,8 @@ public class SubscriptionDataSource {
 		String sitOPtCallbackURL = new Configuration().getSitOPTSRSServiceAddress() + "/rest/callback?CorrelationId="
 				+ sub.getCorrelation() + "&AddressingId=" + sub.getAddrMsgId() + "&CallbackEndpoint=" + URLEncoder.encode(sub.getEndpoint());
 
-		System.out.println("Constructed CallbackUrl for Subscription:");
-		System.out.println(sitOPtCallbackURL);
+		LOG.log(Level.FINEST,"Constructed CallbackUrl for Subscription:");
+		LOG.log(Level.FINEST,sitOPtCallbackURL);
 
 		JSONObject subJson = new JSONObject();
 
@@ -132,8 +138,8 @@ public class SubscriptionDataSource {
 			CloseableHttpResponse response1 = httpclient.execute(post);
 			String responseAsString = IOUtils.readStringFromStream(response1.getEntity().getContent());
 
-			System.out.println("Sent POST to " + sitOptAddr);
-			System.out.println("ResponseBody: " + responseAsString);
+			LOG.log(Level.FINEST,"Sent POST to " + sitOptAddr);
+			LOG.log(Level.FINEST,"ResponseBody: " + responseAsString);
 
 		} catch (ClientProtocolException e) {
 			e.printStackTrace();
@@ -148,7 +154,7 @@ public class SubscriptionDataSource {
 	private String fetchAddressingIdFromSitOPTCallbackEndpoint(String sitOptCallbackEndpoint){
 		// we gonna fetch the CallbackEndpoint part
 		// http://192.168.209.224:8080/srsTestService/rest/callback?CorrelationId=someCorrelation123&AddressingId=null&CallbackEndpoint=http%3A%2F%2F192.168.209.224%3A9763%2Fservices%2FsrsServiceCallback
-		System.out.println("Fetching SitME Workflow AddressingId from " + sitOptCallbackEndpoint);
+		LOG.log(Level.FINEST,"Fetching SitME Workflow AddressingId from " + sitOptCallbackEndpoint);
 		if(!this.hasQuery(sitOptCallbackEndpoint)){
 			// this url doesn't seem to be using some query => not SRS callback endpoint
 			return null;
@@ -172,7 +178,7 @@ public class SubscriptionDataSource {
 			return null;
 		}
 		
-		System.out.println("Fetching SitME Workflow CorrelationID from " + sitOptCallbackEndpoint);
+		LOG.log(Level.FINEST,"Fetching SitME Workflow CorrelationID from " + sitOptCallbackEndpoint);
 		
 		String queryString = sitOptCallbackEndpoint.split("\\?")[1];
 		
@@ -185,7 +191,7 @@ public class SubscriptionDataSource {
 	}
 	
 	public String fetchEndpointFromSitOPTCallbackEndpoint(String sitOptCallbackEndpoint){
-		System.out.println("Fetching SitME Workflow callbackEndpoint from " + sitOptCallbackEndpoint);
+		LOG.log(Level.FINEST,"Fetching SitME Workflow callbackEndpoint from " + sitOptCallbackEndpoint);
 		
 		// we gonna fetch the CallbackEndpoint part
 		// http://192.168.209.224:8080/srsTestService/rest/callback?CorrelationId=someCorrelation123&AddressingId=null&CallbackEndpoint=http%3A%2F%2F192.168.209.224%3A9763%2Fservices%2FsrsServiceCallback
@@ -201,7 +207,7 @@ public class SubscriptionDataSource {
 
 		String decodedCallbackEndpointString = URLDecoder.decode(encodedCallbackEndpointString);
 	
-		System.out.println("Found following Endpoint: " + decodedCallbackEndpointString);
+		LOG.log(Level.FINEST,"Found following Endpoint: " + decodedCallbackEndpointString);
 		return decodedCallbackEndpointString;
 		
 	}

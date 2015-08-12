@@ -5,6 +5,8 @@ package iaas.uni.stuttgart.de.srs.resources;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -19,6 +21,7 @@ import javax.ws.rs.core.Response;
 import org.apache.cxf.helpers.IOUtils;
 
 import iaas.uni.stuttgart.de.srs.model.Subscription;
+import iaas.uni.stuttgart.de.srs.service.impl.SrsServiceSOAPImpl;
 import net.sf.json.JSON;
 import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
@@ -29,6 +32,9 @@ import net.sf.json.JSONSerializer;
  */
 public class CallbackResource extends RESTResource {
 
+	private static final Logger LOG = Logger.getLogger(CallbackResource.class
+			.getName());
+	
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response callback(@Context HttpServletRequest httpRequest) {
@@ -40,7 +46,7 @@ public class CallbackResource extends RESTResource {
 		String situationId = null;
 		String thingId = null;
 
-		System.out.println("CallbackResource#callback called with: ");
+		LOG.log(Level.FINEST,"CallbackResource#callback called with: ");
 		String body = null;
 		try {
 			body = IOUtils.readStringFromStream(httpRequest.getInputStream());
@@ -53,8 +59,8 @@ public class CallbackResource extends RESTResource {
 		situationId = ((JSONObject) jsonBody).getString("situationtemplate");
 		thingId = ((JSONObject) jsonBody).getString("thing");
 
-		System.out.println("Parsed JSON body: ");
-		System.out.println(jsonBody);
+		LOG.log(Level.FINEST,"Parsed JSON body: ");
+		LOG.log(Level.FINEST,jsonBody.toString());
 
 
 		for (Object paramName : Collections.list(httpRequest.getParameterNames())) {
@@ -78,10 +84,10 @@ public class CallbackResource extends RESTResource {
 
 		}
 
-		System.out.println("Found following query values: ");
-		System.out.println("CorrelationId: " + correlationId);
-		System.out.println("AddressingId: " + addressingId);
-		System.out.println("CallbackEndpoint: " + callbackEndpoint);
+		LOG.log(Level.FINEST,"Found following query values: ");
+		LOG.log(Level.FINEST,"CorrelationId: " + correlationId);
+		LOG.log(Level.FINEST,"AddressingId: " + addressingId);
+		LOG.log(Level.FINEST,"CallbackEndpoint: " + callbackEndpoint);
 
 		Subscription sub = this.getSub(situationId, thingId, correlationId, callbackEndpoint);
 
