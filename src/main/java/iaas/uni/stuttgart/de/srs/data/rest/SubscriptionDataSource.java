@@ -185,15 +185,15 @@ public class SubscriptionDataSource {
 	}
 	
 	public String fetchEndpointFromSitOPTCallbackEndpoint(String sitOptCallbackEndpoint){
+		System.out.println("Fetching SitME Workflow callbackEndpoint from " + sitOptCallbackEndpoint);
 		
+		// we gonna fetch the CallbackEndpoint part
+		// http://192.168.209.224:8080/srsTestService/rest/callback?CorrelationId=someCorrelation123&AddressingId=null&CallbackEndpoint=http%3A%2F%2F192.168.209.224%3A9763%2Fservices%2FsrsServiceCallback
 		if(!this.hasQuery(sitOptCallbackEndpoint)){
 			// this url doesn't seem to be using some query => not SRS callback endpoint
 			return null;
 		}
 		
-		// we gonna fetch the CallbackEndpoint part
-		// http://192.168.209.224:8080/srsTestService/rest/callback?CorrelationId=someCorrelation123&AddressingId=null&CallbackEndpoint=http%3A%2F%2F192.168.209.224%3A9763%2Fservices%2FsrsServiceCallback
-		System.out.println("Fetching SitME Workflow callbackEndpoint from " + sitOptCallbackEndpoint);
 		
 		String queryString = sitOptCallbackEndpoint.split("\\?")[1];
 		
